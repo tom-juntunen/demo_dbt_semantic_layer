@@ -1,0 +1,86 @@
+semantic_models:
+  - name: transaction_costs
+    description: "A semantic model for transaction costs, linking transactions, items, and inventory status."
+    model: ref('fct_inventory')
+    defaults:
+      agg_time_dimension: transaction_date
+    config:
+      enabled: true
+      +group: financial_metrics
+      meta:
+        description: "This model tracks transaction costs over time."
+
+    entities:
+      - name: transaction
+        type: primary
+        expr: transaction_id
+
+      - name: item
+        type: foreign
+        expr: item_id
+
+      - name: location
+        type: foreign
+        expr: location_id
+
+      - name: bin
+        type: foreign
+        expr: bin_id
+
+      - name: inventory_status
+        type: foreign
+        expr: inventory_status_id
+
+    dimensions:
+      - name: transaction_date
+        type: time
+        type_params:
+          time_granularity: day
+
+      - name: item_name
+        type: categorical
+        expr: item_name
+
+      - name: item_id
+        type: categorical
+        expr: item_id
+
+      - name: bin_name
+        type: categorical
+        expr: bin_name
+
+      - name: bin_id
+        type: categorical
+        expr: bin_id
+
+      - name: inventory_status_name
+        type: categorical
+        expr: inventory_status_name
+
+      - name: inventory_status_id
+        type: categorical
+        expr: inventory_status_id
+
+      - name: location_name
+        type: categorical
+        expr: location_name
+
+      - name: location_id
+        type: categorical
+        expr: location_id
+
+    measures:
+      - name: total_value
+        description: "The total value of transactions based on quantity and cost."
+        agg: sum
+        expr: value  # Derived from quantity * cost
+
+      - name: total_cost
+        description: "The total cost of the transactions."
+        agg: sum
+        expr: cost
+
+      - name: total_quantity
+        description: "The total quantity of items in the transaction."
+        agg: sum
+        expr: quantity

@@ -1,0 +1,2 @@
+dbt-duckdb: https://docs.getdbt.com/docs/core/connect-data-platform/duckdb-setup
+duckdb functions syntax: https://duckdb.org/docs/sql/functions/

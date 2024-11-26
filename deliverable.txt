@@ -1,0 +1,41 @@
+1. The six csv files have been loaded into the database as tables using `dbt seed`
+2. Created `inventory_daily` table with the following columns:
+    - [Date, Location, Bin, Status, Item, Quantity, Value] where quantity is the total number of units of that item in `Location+Bin+Status` for that Date. 
+    - Value represents the total monetary value for those items.
+3. Data quality checks in place:
+    - The fact table `fct_inventory` has no duplicates when running a `unique` dbt test on the `transaction_surrogate_id` field. 
+    - The `Value` field is equal to the `Quantity` * `Cost` when running ad-hoc checks.
+    - 13 items have no effective cost prior to the transaction date, for 63 different transactions.
+    - What are the meaning of each `Status` name? Do they impact how the transactions are aggregated? (e.g. ItemShip	C)
+
+4a. What is the quantity, and location/bin/status combos of item 355576 on date 2022-11-21?
+┌────────────┬─────────┬──────────┬──────────────────────┬─────────────────────────────┬──────────────────────────────────┬──────────────────────┐
+│    Date    │ Item ID │ Quantity │       Location       │             Bin             │              Status              │ max_transaction_date │
+│    date    │  int32  │  int128  │       varchar        │           varchar           │             varchar              │         date         │
+├────────────┼─────────┼──────────┼──────────────────────┼─────────────────────────────┼──────────────────────────────────┼──────────────────────┤
+│ 2022-11-07 │  355576 │       33 │ c7a95e433e878be525…  │ 948788e8d16e5b3308a262657…  │ 4cd4366e175ccb908e7cc97e6dc350bd │ 2022-11-07           │
+└────────────┴─────────┴──────────┴──────────────────────┴─────────────────────────────┴──────────────────────────────────┴──────────────────────┘
+
+    - Quantity: 33
+    - Location: c7a95e433e878be525d03a08d6ab666b
+    - Bin: 948788e8d16e5b3308a26265764071c7
+    - Status: 4cd4366e175ccb908e7cc97e6dc350bd
+
+4b. What is the total value of item 209372 on 2022-06-05?
+
+┌───────────────┐
+│     Value     │
+│ decimal(38,2) │
+├───────────────┤
+│      14196.14 │
+└───────────────┘
+
+4c. What is the total value of inventory in Location
+c7a95e433e878be525d03a08d6ab666b on 2022-01-01?
+
+┌───────────────┐
+│     Value     │
+│ decimal(38,2) │
+├───────────────┤
+│    3826444.54 │
+└───────────────┘

@@ -1,0 +1,28 @@
+metrics:
+  - name: cumulative_inventory_value
+    description: "Cumulative value of inventory over time."
+    type: cumulative
+    label: Cumulative Inventory Value
+    type_params:
+      measure:
+        name: total_value
+        fill_nulls_with: 0
+    filter: |
+      {{ Dimension('transaction__item_id') }} = {{ Entity('item') }} and
+      {{ Dimension('transaction__location_id') }} = {{ Entity('location') }} and
+      {{ Dimension('transaction__bin_id') }} = {{ Entity('bin') }} and
+      {{ Dimension('transaction__inventory_status_id') }} = {{ Entity('inventory_status') }}
+
+  - name: cumulative_inventory_quantity
+    description: "Cumulative quantity of inventory over time."
+    type: cumulative
+    label: Cumulative Inventory Quantity
+    type_params:
+      measure:
+        name: total_quantity
+        fill_nulls_with: 0
+    filter: |
+      {{ Dimension('transaction__item_id') }} = {{ Entity('item') }} and
+      {{ Dimension('transaction__location_id') }} = {{ Entity('location') }} and
+      {{ Dimension('transaction__bin_id') }} = {{ Entity('bin') }} and
+      {{ Dimension('transaction__inventory_status_id') }} = {{ Entity('inventory_status') }}

@@ -1,0 +1,24 @@
+
+version: 2
+
+models:
+  - name: fct_inventory
+    description: "A fact table showing inventory transactions"
+    columns:
+      - name: transaction_surrogate_id
+        description: "A unique primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+      - name: cost
+        description: "The effective cost for this item, location, and date"
+        data_tests:
+          - not_null
+  - name: inventory_daily
+    description: "A table showing daily inventory"
+    columns: 
+      - name: transaction_surrogate_id
+        description: "A unique primary key for this table"
+        data_tests:
+          - unique
+          - not_null
