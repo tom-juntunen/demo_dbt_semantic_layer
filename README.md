@@ -44,3 +44,8 @@ and_test:
 ```python test_db.py``` 
 
 ![alt text](image.png)
+
+#### Query the Semantic Layer
+1. Using `dbt-core` 
+
+example: ```mf query --metrics cumulative_inventory_quantity --group-by "transaction__transaction_date,transaction__item_id,transaction__location_name,transaction__bin_name,transaction__inventory_status_name" --where "transaction__item_id=209372 and transaction__transaction_date__day='2022-06-05'" --order "-transaction__transaction_date__day"```
