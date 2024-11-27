@@ -15,5 +15,5 @@ final as (
 
 select *
 from final
-where date_day > (current_date() - INTERVAL '4' YEAR)
-  and date_day < date_add(current_date(), INTERVAL '30' DAY)
+where date_day > DATEADD(YEAR, -4, current_date())
+  and date_day < DATEADD(DAY, 30, current_date())
