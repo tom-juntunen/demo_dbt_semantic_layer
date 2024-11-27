@@ -1,11 +1,12 @@
-{{ config(materialized='table') }}
 
+{{config(materialized='table')}}
 with days as (
-    {{ dbt.date_spine(
+    {{dbt.date_spine(
         'day',
         "'2000-01-01'::DATE",
         "'2025-01-01'::DATE"
-    ) }}
+    )
+    }}
 ),
 
 final as (
@@ -15,5 +16,5 @@ final as (
 
 select *
 from final
-where date_day > (current_date() - INTERVAL '4' YEAR)
-  and date_day < date_add(current_date(), INTERVAL '30' DAY)
+where date_day > (current_date - INTERVAL 4 YEAR)
+and date_day < date_add(current_date, INTERVAL 30 DAY)
