@@ -83,25 +83,19 @@ costed_transactions AS (
     LEFT JOIN bins b ON t1.bin_id = b.id
     LEFT JOIN inventory_statuses s ON t1.inventory_status_id = s.id
     LEFT JOIN locations l ON t1.location_id = l.id
-    -- find the most recent effective cost for each transaction 
+    -- Find the most recent effective cost for each transaction using window function
     LEFT JOIN (
         SELECT 
             c1.item_id,
             c1.location_id,
-            c1.cost
+            c1.cost,
+            ROW_NUMBER() OVER (PARTITION BY c1.item_id, c1.location_id ORDER BY c1.date DESC) AS rn
         FROM costs c1
-        WHERE c1.date = (
-            SELECT MAX(c2.date)
-            FROM costs c2
-            WHERE c2.item_id = c1.item_id 
-            AND c2.location_id = c1.location_id
-            AND c2.date <= (
-                SELECT MAX(t2.transaction_date) 
-                FROM transactions t2 
-                WHERE t2.item_id = c1.item_id 
-                    AND t2.location_id = c1.location_id)
-        )
-    ) c ON t1.item_id = c.item_id AND t1.location_id = c.location_id
+        WHERE c1.date <= (SELECT MAX(t2.transaction_date) 
+                           FROM transactions t2 
+                           WHERE t2.item_id = c1.item_id 
+                             AND t2.location_id = c1.location_id)
+    ) c ON t1.item_id = c.item_id AND t1.location_id = c.location_id AND c.rn = 1  -- Only the most recent cost
 )
 
 SELECT * FROM costed_transactions
