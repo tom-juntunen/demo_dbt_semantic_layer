@@ -1,0 +1,112 @@
+
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+name: 'and_test'
+version: '1.0.0'
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'and_test'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+models:
+  and_test:
+    +materialized: table
+
+seeds:
+  and_test:
+    bin:
+      +column_types:
+        id: bigint
+        name: varchar(32)
+      +post-hook: 
+        - "DROP INDEX IF EXISTS idx_bin_id;"
+        - "CREATE INDEX idx_bin_id ON bin (id);"
+
+    costs:
+      full_refresh: true
+      +column_types:
+        date: varchar(32)
+        location_id: bigint
+        item_id: bigint
+        cost: double
+      +post-hook: 
+        - "DROP INDEX IF EXISTS idx_costs_date;"
+        - "DROP INDEX IF EXISTS idx_costs_location_id;"
+        - "DROP INDEX IF EXISTS idx_costs_item_id;"
+        - "UPDATE costs SET date = CAST(STRPTIME(date, '%-m/%-d/%Y') AS DATE);"
+        - "ALTER TABLE costs ALTER COLUMN date SET DATA TYPE DATE;"
+        - "CREATE INDEX idx_costs_date ON costs (date);"
+        - "CREATE INDEX idx_costs_location_id ON costs (location_id);"
+        - "CREATE INDEX idx_costs_item_id ON costs (item_id);"
+
+    inventory_status:
+      +column_types:
+        id: integer
+        name: varchar(32)
+      +post-hook: 
+        - "DROP INDEX IF EXISTS idx_inventory_status_id;"
+        - "CREATE INDEX idx_inventory_status_id ON inventory_status (id);"
+
+    item:
+      +column_types:
+        id: bigint
+        name: varchar(32)
+      +post-hook: 
+        - "DROP INDEX IF EXISTS idx_item_id;"
+        - "CREATE INDEX idx_item_id ON item (id);"
+
+    location:
+      +column_types:
+        id: bigint
+        name: varchar(32)
+      +post-hook: 
+        - "DROP INDEX IF EXISTS idx_location_id;"
+        - "CREATE INDEX idx_location_id ON location (id);"
+
+    transaction_line:
+      +column_types:
+        transaction_date: timestamp
+        transaction_id: bigint
+        transaction_line_id: integer
+        transaction_type: varchar(32)
+        type_based_document_number: varchar(16)
+        type_based_document_status: varchar(8)
+        item_id: bigint
+        bin_id: bigint
+        inventory_status_id: integer
+        location_id: bigint
+        quantity: integer
+      +post-hook: 
+        - "DROP INDEX IF EXISTS idx_transaction_line_id;"
+        - "DROP INDEX IF EXISTS idx_transaction_line_line_id;"
+        - "DROP INDEX IF EXISTS idx_transaction_line_item_id;"
+        - "DROP INDEX IF EXISTS idx_transaction_line_bin_id;"
+        - "DROP INDEX IF EXISTS idx_transaction_line_inventory_status_id;"
+        - "DROP INDEX IF EXISTS idx_transaction_line_location_id;"
+        - "CREATE INDEX idx_transaction_line_id ON transaction_line (transaction_id);"
+        - "CREATE INDEX idx_transaction_line_line_id ON transaction_line (transaction_line_id);"
+        - "CREATE INDEX idx_transaction_line_item_id ON transaction_line (item_id);"
+        - "CREATE INDEX idx_transaction_line_bin_id ON transaction_line (bin_id);"
+        - "CREATE INDEX idx_transaction_line_inventory_status_id ON transaction_line (inventory_status_id);"
+        - "CREATE INDEX idx_transaction_line_location_id ON transaction_line (location_id);"
